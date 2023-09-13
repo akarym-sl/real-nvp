@@ -31,6 +31,7 @@ class CouplingLayer(nn.Module):
         # Build scale and translate network
         if self.mask_type == MaskType.CHANNEL_WISE:
             in_channels //= 2
+        # TODO CHANGE JUST RESNET. REPLACE WITH SOME TRANSFORMER!!!
         self.st_net = ResNet(in_channels, mid_channels, 2 * in_channels,
                              num_blocks=num_blocks, kernel_size=3, padding=1,
                              double_after_norm=(self.mask_type == MaskType.CHECKERBOARD))
@@ -62,7 +63,7 @@ class CouplingLayer(nn.Module):
                 x = (x + t) * exp_s
 
                 # Add log-determinant of the Jacobian
-                sldj += s.view(s.size(0), -1).sum(-1)
+                sldj += s.reshape(s.size(0), -1).sum(-1)
         else:
             # Channel-wise mask
             if self.reverse_mask:
@@ -87,7 +88,7 @@ class CouplingLayer(nn.Module):
                 x_change = (x_change + t) * exp_s
 
                 # Add log-determinant of the Jacobian
-                sldj += s.view(s.size(0), -1).sum(-1)
+                sldj += s.reshape(s.size(0), -1).sum(-1)
 
             if self.reverse_mask:
                 x = torch.cat((x_id, x_change), dim=1)

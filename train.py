@@ -140,9 +140,9 @@ if __name__ == '__main__':
     parser.add_argument('--gpu_ids', default='[0]', type=eval, help='IDs of GPUs to use')
     parser.add_argument('--lr', default=1e-3, type=float, help='Learning rate')
     parser.add_argument('--max_grad_norm', type=float, default=100., help='Max gradient norm for clipping')
-    parser.add_argument('--num_epochs', default=100, type=int, help='Number of epochs to train')
+    parser.add_argument('--num_epochs', default=1000, type=int, help='Number of epochs to train')
     parser.add_argument('--num_samples', default=64, type=int, help='Number of samples at test time')
-    parser.add_argument('--num_workers', default=8, type=int, help='Number of data loader threads')
+    parser.add_argument('--num_workers', default=1, type=int, help='Number of data loader threads')
     parser.add_argument('--resume', '-r', action='store_true', help='Resume from checkpoint')
     parser.add_argument('--weight_decay', default=5e-5, type=float,
                         help='L2 regularization (only applied to the weight norm scale factors)')
