@@ -9,7 +9,7 @@ class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(ResidualBlock, self).__init__()
 
-        self.in_norm = nn.BatchNorm2d(in_channels)
+        self.in_norm = nn.BatchNorm2d(in_channels) # https://arxiv.org/pdf/1502.03167.pdf
         self.in_conv = WNConv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False)
 
         self.out_norm = nn.BatchNorm2d(out_channels)
