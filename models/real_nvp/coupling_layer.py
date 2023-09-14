@@ -4,7 +4,7 @@ import torch.nn as nn
 from enum import IntEnum
 from models.resnet import ResNet
 from util import checkerboard_mask
-
+from models.swin_transformer import SwinTransformer
 
 class MaskType(IntEnum):
     CHECKERBOARD = 0
@@ -31,10 +31,12 @@ class CouplingLayer(nn.Module):
         # Build scale and translate network
         if self.mask_type == MaskType.CHANNEL_WISE:
             in_channels //= 2
-        # TODO CHANGE JUST RESNET. REPLACE WITH SOME TRANSFORMER!!!
-        self.st_net = ResNet(in_channels, mid_channels, 2 * in_channels,
-                             num_blocks=num_blocks, kernel_size=3, padding=1,
-                             double_after_norm=(self.mask_type == MaskType.CHECKERBOARD))
+        img_size = 32 if in_channels == 3 else 16
+        self.st_net = SwinTransformer(img_size=img_size, 
+                                      in_chans=in_channels,
+                                      num_classes=-1,
+                                      patch_size=img_size//8,
+                                      window_size=4)
 
         # Learnable scale for s
         self.rescale = nn.utils.weight_norm(Rescale(in_channels))
@@ -45,6 +47,7 @@ class CouplingLayer(nn.Module):
             b = checkerboard_mask(x.size(2), x.size(3), self.reverse_mask, device=x.device)
             x_b = x * b
             st = self.st_net(x_b)
+            st = st.reshape((x.shape[0], x.shape[1] * 2, x.shape[2], x.shape[3]))
             s, t = st.chunk(2, dim=1)
             s = self.rescale(torch.tanh(s))
             s = s * (1 - b)
@@ -72,6 +75,7 @@ class CouplingLayer(nn.Module):
                 x_change, x_id = x.chunk(2, dim=1)
 
             st = self.st_net(x_id)
+            st = st.reshape((x_id.shape[0], x_id.shape[1] * 2, x_id.shape[2], x_id.shape[3]))
             s, t = st.chunk(2, dim=1)
             s = self.rescale(torch.tanh(s))
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
+#SBATCH --mem 128000
 #SBATCH --time=3:00:00
 #SBATCH --nodes=1
 #SBATCH --output=output.txt
